@@ -27,4 +27,9 @@ public class CompanyController {
         return companies.stream().filter(company -> company.getId() == id).findAny()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found"));
     }
+
+    @GetMapping("/companies/all")
+    public List<Company> getAllCompanies() {
+        return companies;
+    }
 }

@@ -2,6 +2,7 @@ package com.oocl.demo;
 
 import com.oocl.demo.model.Company;
 
+import com.oocl.demo.model.Employee;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
@@ -56,5 +57,27 @@ public class CompanyControllerTest {
         mockMvc.perform(get("/companies/{id}", 2)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Order(4)
+    void should_return_company_list_when_get_given_companies() throws Exception {
+        String requestBody = """
+                    {
+                        "name": "Google"
+                    }
+                """;
+        mockMvc.perform(post("/companies")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(requestBody));
+
+        mockMvc.perform(get("/companies/all")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("Apple"))
+                .andExpect(jsonPath("$[1].id").value(2))
+                .andExpect(jsonPath("$[1].name").value("Google"));
     }
 }
