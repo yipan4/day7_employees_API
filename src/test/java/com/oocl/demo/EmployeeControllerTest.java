@@ -150,6 +150,7 @@ public class EmployeeControllerTest {
     }
 
     @Test
+    @Order(7)
     void should_delete_employee_when_delete_given_employee_exists() throws Exception {
         Employee updatedEmployee = maryJane();
         mockMvc.perform(delete("/employees/{id}",2)
@@ -162,4 +163,12 @@ public class EmployeeControllerTest {
                 .andExpect(jsonPath("$.salary").value(updatedEmployee.getSalary()));
     }
 
+    @Test
+    @Order(8)
+    void should_return_204_employee_when_delete_given_employee_not_exists() throws Exception {
+        Employee updatedEmployee = maryJane();
+        mockMvc.perform(delete("/employees/{id}",2)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNoContent());
+    }
 }
