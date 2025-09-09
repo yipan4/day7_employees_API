@@ -39,4 +39,16 @@ public class CompanyControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1));
     }
+
+    @Test
+    @Order(2)
+    void should_return_company_when_get_given_company_id() throws Exception {
+        mockMvc.perform(get("/companies/{id}", 1)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Apple"));
+    }
+
+
 }
