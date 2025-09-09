@@ -123,9 +123,67 @@ public class CompanyControllerTest {
 
     @Test
     @Order(8)
-    void should_throw_404_company_when_delete_given_company_id_not_exist() throws Exception {
+    void should_throw_204_company_when_delete_given_company_id_not_exist() throws Exception {
         mockMvc.perform(delete(("/companies/{id}"), 2)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @Order(9)
+    void should_return_page_query_when_page_query_given_enough_companies() throws Exception {
+        String requestBody = """
+                    {
+                        "name": "Amazon"
+                    }
+                """;
+        mockMvc.perform(post("/companies")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+        requestBody = """
+                    {
+                        "name": "Netflix"
+                    }
+                """;
+        mockMvc.perform(post("/companies")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+        requestBody = """
+                    {
+                        "name": "X"
+                    }
+                """;
+        mockMvc.perform(post("/companies")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+        requestBody = """
+                    {
+                        "name": "Nvidia"
+                    }
+                """;
+        mockMvc.perform(post("/companies")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+        requestBody = """
+                    {
+                        "name": "AMD"
+                    }
+                """;
+        mockMvc.perform(post("/companies")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+
+        mockMvc.perform(get("/companies-page?page=1&size=5")
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("Apple"))
+                .andExpect(jsonPath("$[1].id").value(3))
+                .andExpect(jsonPath("$[1].name").value("Amazon"))
+                .andExpect(jsonPath("$[2].id").value(4))
+                .andExpect(jsonPath("$[2].name").value("Netflix"))
+                .andExpect(jsonPath("$[3].id").value(5))
+                .andExpect(jsonPath("$[3].name").value("X"))
+                .andExpect(jsonPath("$[4].id").value(6))
+                .andExpect(jsonPath("$[4].name").value("Nvidia"));
     }
 }

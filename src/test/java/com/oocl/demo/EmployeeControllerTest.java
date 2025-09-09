@@ -194,7 +194,7 @@ public class EmployeeControllerTest {
 
     @Test
     @Order(9)
-    void should_return_page_query_when_page_query_when_enough_employees() throws Exception {
+    void should_return_page_query_when_page_query_given_enough_employees() throws Exception {
         String requestBody = """
                     {
                         "name": "Ben Smith",

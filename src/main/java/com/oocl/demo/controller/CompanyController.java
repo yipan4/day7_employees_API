@@ -57,4 +57,17 @@ public class CompanyController {
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
+
+    @GetMapping("/companies-page")
+    public List<Company> getCompaniesPagination(@RequestParam int page, @RequestParam int size) {
+        List<Company> paginationResult = new ArrayList<>();
+        int startingIndex = size*(page - 1);
+        for (int i = startingIndex; i < startingIndex + size; i++) {
+            if (i >= companies.size()) {
+                break;
+            }
+            paginationResult.add(companies.get(i));
+        }
+        return paginationResult;
+    }
 }
