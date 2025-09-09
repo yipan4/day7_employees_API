@@ -33,8 +33,17 @@ public class EmployeeControllerTest {
                 .andExpect(jsonPath("$.id").value(1));
     }
 
-//    @Test
-//    void should_return_employee_when_get_given_employee_id() throws Exception {
-//        mockMvc.perform("/employees/{id}")
-//    }
+    @Test
+    void should_return_employee_when_get_given_employee_id() throws Exception {
+        mockMvc.perform(get("/employees/{id}",1)
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("John Smith"))
+                .andExpect(jsonPath("$.age").value(30))
+                .andExpect(jsonPath("$.gender").value("MALE"))
+                .andExpect(jsonPath("$.salary").value(60000));
+    }
+
+
 }
