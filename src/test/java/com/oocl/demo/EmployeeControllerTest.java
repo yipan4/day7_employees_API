@@ -149,9 +149,17 @@ public class EmployeeControllerTest {
                 .andExpect(jsonPath("$.salary").value(updatedEmployee.getSalary()));
     }
 
-//    @Test
-//    void should_delete_employee_when_delete_given_employee_exists() {
-//
-//    }
+    @Test
+    void should_delete_employee_when_delete_given_employee_exists() throws Exception {
+        Employee updatedEmployee = maryJane();
+        mockMvc.perform(delete("/employees/{id}",2)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(updatedEmployee.getId()))
+                .andExpect(jsonPath("$.name").value(updatedEmployee.getName()))
+                .andExpect(jsonPath("$.age").value(updatedEmployee.getAge()))
+                .andExpect(jsonPath("$.gender").value(updatedEmployee.getGender()))
+                .andExpect(jsonPath("$.salary").value(updatedEmployee.getSalary()));
+    }
 
 }

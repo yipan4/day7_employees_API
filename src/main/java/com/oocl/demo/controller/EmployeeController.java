@@ -7,6 +7,7 @@ import com.oocl.demo.model.Employee;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -57,5 +58,18 @@ public class EmployeeController {
         updatedEmployee.setAge(employeeToBeUpdated.getAge());
         updatedEmployee.setSalary(employeeToBeUpdated.getSalary());
         return updatedEmployee;
+    }
+
+    @DeleteMapping("employees/{id}")
+    public ResponseEntity<Employee> deleteEmployee(@PathVariable long id) {
+        Iterator<Employee> iter = employees.iterator();
+        while (iter.hasNext()) {
+            Employee deletedEmployee = iter.next();
+            if (deletedEmployee.getId() == (id)) {
+                iter.remove();
+                return ResponseEntity.status(HttpStatus.OK).body(deletedEmployee);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 }
