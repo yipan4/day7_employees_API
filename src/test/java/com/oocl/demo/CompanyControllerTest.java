@@ -50,5 +50,11 @@ public class CompanyControllerTest {
                 .andExpect(jsonPath("$.name").value("Apple"));
     }
 
-
+    @Test
+    @Order(3)
+    void should_throw_404_when_get_given_company_id_not_exist() throws Exception {
+        mockMvc.perform(get("/companies/{id}", 2)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound());
+    }
 }
