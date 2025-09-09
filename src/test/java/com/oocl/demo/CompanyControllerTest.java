@@ -96,4 +96,19 @@ public class CompanyControllerTest {
                 .andExpect(jsonPath("$.id").value(2))
                 .andExpect(jsonPath("$.name").value("Meta"));
     }
+
+    @Test
+    @Order(6)
+    void should_throw_404_when_put_given_company_update_infos_not_exist() throws Exception {
+        String requestBody = """
+                    {
+                        "name": "Meta"
+                    }
+                """;
+        mockMvc.perform(put("/companies/{id}",3)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(requestBody))
+                .andExpect(status().isNotFound());
+    }
+
 }

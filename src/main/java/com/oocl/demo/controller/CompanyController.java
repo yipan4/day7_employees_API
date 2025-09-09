@@ -1,7 +1,6 @@
 package com.oocl.demo.controller;
 
 import com.oocl.demo.model.Company;
-import com.oocl.demo.model.Employee;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
