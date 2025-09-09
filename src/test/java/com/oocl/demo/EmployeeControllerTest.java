@@ -128,6 +128,28 @@ public class EmployeeControllerTest {
                 .andExpect(jsonPath("$[1].gender").value(expectedEmployee_2.getGender()))
                 .andExpect(jsonPath("$[1].salary").value(expectedEmployee_2.getSalary()));
     }
-
+    @Test
+    @Order(6)
+    void should_update_employee_when_put_given_employee_update_infos() throws Exception {
+        Employee updatedEmployee = newJohnSmith();
+        String requestBody = """
+                    {
+                        "id": 1,
+                        "name": "John Smith",
+                        "age": 31,
+                        "gender": "MALE",
+                        "salary": 70000
+                    }
+                """;
+        mockMvc.perform(put("/employees/update",1)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(updatedEmployee.getId()))
+                .andExpect(jsonPath("$.name").value(updatedEmployee.getName()))
+                .andExpect(jsonPath("$.age").value(updatedEmployee.getAge()))
+                .andExpect(jsonPath("$.gender").value(updatedEmployee.getGender()))
+                .andExpect(jsonPath("$.salary").value(updatedEmployee.getSalary()));
+    }
 
 }
