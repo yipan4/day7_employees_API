@@ -1,11 +1,14 @@
 package com.oocl.demo.controller;
 
 import com.oocl.demo.model.Company;
+import com.oocl.demo.model.Employee;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -40,5 +43,18 @@ public class CompanyController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found"));
         updatedCompany.setName(updateCompany.getName());
         return updatedCompany;
+    }
+
+    @DeleteMapping("/companies/{id}")
+    public ResponseEntity<Company> deleteCompany(@PathVariable long id) {
+        Iterator<Company> iter = companies.iterator();
+        while (iter.hasNext()) {
+            Company deletedCompany = iter.next();
+            if (deletedCompany.getId() == (id)) {
+                iter.remove();
+                return ResponseEntity.status(HttpStatus.OK).body(deletedCompany);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 }
