@@ -134,14 +134,11 @@ public class EmployeeControllerTest {
         Employee updatedEmployee = newJohnSmith();
         String requestBody = """
                     {
-                        "id": 1,
-                        "name": "John Smith",
                         "age": 31,
-                        "gender": "MALE",
                         "salary": 70000
                     }
                 """;
-        mockMvc.perform(put("/employees/update",1)
+        mockMvc.perform(put("/employees/{id}",1)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -151,5 +148,10 @@ public class EmployeeControllerTest {
                 .andExpect(jsonPath("$.gender").value(updatedEmployee.getGender()))
                 .andExpect(jsonPath("$.salary").value(updatedEmployee.getSalary()));
     }
+
+//    @Test
+//    void should_delete_employee_when_delete_given_employee_exists() {
+//
+//    }
 
 }

@@ -49,10 +49,10 @@ public class EmployeeController {
         return employees;
     }
 
-    @PutMapping("/employees/update")
-    public Employee updateEmployeeInfo(@RequestBody Employee employeeToBeUpdated) {
+    @PutMapping("/employees/{id}")
+    public Employee updateEmployeeInfo(@PathVariable long id, @RequestBody Employee employeeToBeUpdated) {
         Employee updatedEmployee = employees.stream().filter(employee ->
-                        employeeToBeUpdated.getId() == employee.getId()).findAny()
+                        employee.getId() == id).findAny()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found"));
         updatedEmployee.setAge(employeeToBeUpdated.getAge());
         updatedEmployee.setSalary(employeeToBeUpdated.getSalary());
