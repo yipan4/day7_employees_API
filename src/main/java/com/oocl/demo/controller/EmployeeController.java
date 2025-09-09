@@ -60,7 +60,7 @@ public class EmployeeController {
         return updatedEmployee;
     }
 
-    @DeleteMapping("employees/{id}")
+    @DeleteMapping("/employees/{id}")
     public ResponseEntity<Employee> deleteEmployee(@PathVariable long id) {
         Iterator<Employee> iter = employees.iterator();
         while (iter.hasNext()) {
@@ -71,5 +71,18 @@ public class EmployeeController {
             }
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    @GetMapping("/employees-page")
+    public List<Employee> getEmployeesPagination(@RequestParam int page, @RequestParam int size) {
+        List<Employee> paginationResult = new ArrayList<>();
+        int startingIndex = size*(page - 1);
+        for (int i = startingIndex; i < startingIndex + size; i++) {
+            if (i >= employees.size()) {
+                break;
+            }
+            paginationResult.add(employees.get(i));
+        }
+        return paginationResult;
     }
 }

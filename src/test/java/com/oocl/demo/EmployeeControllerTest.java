@@ -36,6 +36,26 @@ public class EmployeeControllerTest {
         return new Employee(1, "John Smith", 31, "MALE", 70000);
     }
 
+    private Employee benSmith() {
+        return new Employee(3, "Ben Smith", 30, "MALE", 50000);
+    }
+
+    private Employee amySmith() {
+        return new Employee(4, "Amy Smith", 30, "FEMALE", 80000);
+    }
+
+    private Employee annClarkson() {
+        return new Employee(5, "Ann Clarkson", 28, "FEMALE", 55000);
+    }
+
+    private Employee claraSmith() {
+        return new Employee(6, "Clara Smith", 40, "FEMALE", 85000);
+    }
+
+    private Employee danielClarkson() {
+        return new Employee(7, "Daniel Clarkson", 32, "MALE", 65000);
+    }
+
     @Test
     @Order(1)
     void should_create_employee_when_post_given_a_valid_body() throws Exception {
@@ -170,5 +190,103 @@ public class EmployeeControllerTest {
         mockMvc.perform(delete("/employees/{id}",2)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @Order(9)
+    void should_return_page_query_when_page_query_when_enough_employees() throws Exception {
+        String requestBody = """
+                    {
+                        "name": "Ben Smith",
+                        "age": 30,
+                        "gender": "MALE",
+                        "salary": 50000
+                    }
+                """;
+        mockMvc.perform(post("/employees")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+        requestBody = """
+                    {
+                        "name": "Amy Smith",
+                        "age": 30,
+                        "gender": "FEMALE",
+                        "salary": 80000
+                    }
+                """;
+        mockMvc.perform(post("/employees")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+        requestBody = """
+                    {
+                        "name": "Ann Clarkson",
+                        "age": 28,
+                        "gender": "FEMALE",
+                        "salary": 55000
+                    }
+                """;
+        mockMvc.perform(post("/employees")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+        requestBody = """
+                    {
+                        "name": "Clara Smith",
+                        "age": 40,
+                        "gender": "FEMALE",
+                        "salary": 85000
+                    }
+                """;
+        mockMvc.perform(post("/employees")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+        requestBody = """
+                    {
+                        "name": "Daniel Clarkson",
+                        "age": 32,
+                        "gender": "MALE",
+                        "salary": 65000
+                    }
+                """;
+        mockMvc.perform(post("/employees")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+        Employee expectedEmployee_1 = newJohnSmith();
+        Employee expectedEmployee_2 = benSmith();
+        Employee expectedEmployee_3 = amySmith();
+        Employee expectedEmployee_4 = annClarkson();
+        Employee expectedEmployee_5 = claraSmith();
+        mockMvc.perform(get("/employees-page?page=1&size=5")
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.length()").value(5))
+                .andExpect(jsonPath("$[0].id").value(expectedEmployee_1.getId()))
+                .andExpect(jsonPath("$[0].age").value(expectedEmployee_1.getAge()))
+                .andExpect(jsonPath("$[0].gender").value(expectedEmployee_1.getGender()))
+                .andExpect(jsonPath("$[0].name").value(expectedEmployee_1.getName()))
+                .andExpect(jsonPath("$[0].salary").value(expectedEmployee_1.getSalary()))
+
+                .andExpect(jsonPath("$[1].id").value(expectedEmployee_2.getId()))
+                .andExpect(jsonPath("$[1].age").value(expectedEmployee_2.getAge()))
+                .andExpect(jsonPath("$[1].gender").value(expectedEmployee_2.getGender()))
+                .andExpect(jsonPath("$[1].name").value(expectedEmployee_2.getName()))
+                .andExpect(jsonPath("$[1].salary").value(expectedEmployee_2.getSalary()))
+
+                .andExpect(jsonPath("$[2].id").value(expectedEmployee_3.getId()))
+                .andExpect(jsonPath("$[2].age").value(expectedEmployee_3.getAge()))
+                .andExpect(jsonPath("$[2].gender").value(expectedEmployee_3.getGender()))
+                .andExpect(jsonPath("$[2].name").value(expectedEmployee_3.getName()))
+                .andExpect(jsonPath("$[2].salary").value(expectedEmployee_3.getSalary()))
+
+                .andExpect(jsonPath("$[3].id").value(expectedEmployee_4.getId()))
+                .andExpect(jsonPath("$[3].age").value(expectedEmployee_4.getAge()))
+                .andExpect(jsonPath("$[3].gender").value(expectedEmployee_4.getGender()))
+                .andExpect(jsonPath("$[3].name").value(expectedEmployee_4.getName()))
+                .andExpect(jsonPath("$[3].salary").value(expectedEmployee_4.getSalary()))
+
+                .andExpect(jsonPath("$[4].id").value(expectedEmployee_5.getId()))
+                .andExpect(jsonPath("$[4].age").value(expectedEmployee_5.getAge()))
+                .andExpect(jsonPath("$[4].gender").value(expectedEmployee_5.getGender()))
+                .andExpect(jsonPath("$[4].name").value(expectedEmployee_5.getName()))
+                .andExpect(jsonPath("$[4].salary").value(expectedEmployee_5.getSalary()));
+
     }
 }
