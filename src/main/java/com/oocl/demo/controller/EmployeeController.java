@@ -37,6 +37,7 @@ public class EmployeeController {
 
     @GetMapping("/employees")
     public List<Employee> queryEmployeeByGender(@RequestParam String gender) {
-        return employees.stream().filter(employee -> employee.getGender().equals(gender)).toList();
+        return employees.stream().filter(employee -> employee.getGender().
+                equalsIgnoreCase(gender)).toList();
     }
 }
