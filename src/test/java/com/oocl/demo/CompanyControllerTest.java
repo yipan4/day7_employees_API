@@ -80,4 +80,20 @@ public class CompanyControllerTest {
                 .andExpect(jsonPath("$[1].id").value(2))
                 .andExpect(jsonPath("$[1].name").value("Google"));
     }
+
+    @Test
+    @Order(5)
+    void should_update_company_when_put_given_company_update_infos() throws Exception {
+        String requestBody = """
+                    {
+                        "name": "Meta"
+                    }
+                """;
+        mockMvc.perform(put("/companies/{id}",2)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(2))
+                .andExpect(jsonPath("$.name").value("Meta"));
+    }
 }
