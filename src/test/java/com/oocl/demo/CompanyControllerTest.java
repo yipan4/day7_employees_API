@@ -116,7 +116,16 @@ public class CompanyControllerTest {
     void should_delete_company_when_delete_given_company_id() throws Exception {
         mockMvc.perform(delete(("/companies/{id}"), 2)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(2))
                 .andExpect(jsonPath("$.name").value("Meta"));
+    }
+
+    @Test
+    @Order(8)
+    void should_throw_404_company_when_delete_given_company_id_not_exist() throws Exception {
+        mockMvc.perform(delete(("/companies/{id}"), 2)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNoContent());
     }
 }
