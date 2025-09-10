@@ -293,7 +293,7 @@ public class EmployeeControllerTest {
         Employee updatedEmployee = maryJane();
         mockMvc.perform(delete("/employees/{id}",2)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andExpect(jsonPath("$.id").value(updatedEmployee.getId()))
                 .andExpect(jsonPath("$.name").value(updatedEmployee.getName()))
                 .andExpect(jsonPath("$.age").value(updatedEmployee.getAge()))

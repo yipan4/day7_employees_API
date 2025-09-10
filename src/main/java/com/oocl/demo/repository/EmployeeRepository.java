@@ -57,7 +57,8 @@ public class EmployeeRepository {
         while (iter.hasNext()) {
             Employee deletedEmployee = iter.next();
             if (deletedEmployee.getId() == (id)) {
-                iter.remove();
+//                iter.remove();
+                deletedEmployee.setStatus(false);
                 return deletedEmployee;
             }
         }

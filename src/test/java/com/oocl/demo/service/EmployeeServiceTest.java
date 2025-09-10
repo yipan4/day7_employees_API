@@ -149,4 +149,15 @@ class EmployeeServiceTest {
                 employeeService.createEmployee(employee));
         verify(employeeRepository, never()).createEmployee(any());
     }
+
+    @Test
+    void should_set_status_false_when_delete_given_employee_status_true() {
+        Employee employee = new Employee();
+        employee.setStatus(true);
+        when(employeeRepository.findEmployeeById(1)).thenReturn(employee);
+        employeeService.deleteEmployee(1);
+        assertFalse(employee.getStatus());
+        verify(employeeRepository, times(1)).findEmployeeById(1);
+        verify(employeeRepository, times(1)).updateEmployee(1, employee);
+    }
 }

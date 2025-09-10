@@ -56,7 +56,10 @@ public class EmployeeService {
     }
 
     public Employee deleteEmployee(long id) {
-        return employeeRepository.deleteEmployee(id);
+        Employee employee = employeeRepository.findEmployeeById(id);
+        employee.setStatus(false);
+        return employeeRepository.updateEmployee(id, employee);
+//        return employeeRepository.deleteEmployee(id);
     }
 
     public List<Employee> getEmployeesByGender(String gender) {

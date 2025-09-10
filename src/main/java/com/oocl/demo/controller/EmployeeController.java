@@ -1,6 +1,7 @@
 package com.oocl.demo.controller;
 
 import com.oocl.demo.service.EmployeeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,8 @@ import java.util.Map;
 
 @RestController
 public class EmployeeController {
-    private final EmployeeService employeeService = new EmployeeService();
+    @Autowired
+    private EmployeeService employeeService;
 
     public void resetData() {
         employeeService.resetData();
@@ -20,24 +22,12 @@ public class EmployeeController {
 
     @PostMapping("/employees")
     public ResponseEntity<Map<String, Long>> createEmployee(@RequestBody Employee employee) {
-        Map<String, Long> id = null;
-        try {
-            id = employeeService.createEmployee(employee);
-            return ResponseEntity.status(HttpStatus.CREATED).body(id);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.createEmployee(employee));
     }
 
     @GetMapping("/employees/{id}")
     public ResponseEntity<Employee> getEmployee(@PathVariable long id) {
-        Employee foundEmployee = null;
-        try {
-            foundEmployee = employeeService.getEmployeeById(id);
-            return ResponseEntity.status(HttpStatus.OK).body(foundEmployee);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(employeeService.getEmployeeById(id));
     }
 
     @GetMapping("/employees/all")
@@ -47,20 +37,12 @@ public class EmployeeController {
 
     @PutMapping("/employees/{id}")
     public ResponseEntity<Employee> updateEmployeeInfo(@PathVariable long id, @RequestBody Employee employeeToBeUpdated) {
-        Employee updatedEmployee = employeeService.updateEmployeeInfo(id, employeeToBeUpdated);
-        if (updatedEmployee != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(updatedEmployee);
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.status(HttpStatus.OK).body(employeeService.updateEmployeeInfo(id, employeeToBeUpdated));
     }
 
     @DeleteMapping("/employees/{id}")
     public ResponseEntity<Employee> deleteEmployee(@PathVariable long id) {
-        Employee deletedEmployee = employeeService.deleteEmployee(id);
-        if (deletedEmployee == null) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(deletedEmployee);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(employeeService.deleteEmployee(id));
     }
 
     @GetMapping("/employees")
@@ -71,13 +53,13 @@ public class EmployeeController {
         if (gender != null) {
             return ResponseEntity.status(HttpStatus.OK).body(employeeService.getEmployeesByGender(gender));
         }
-        if (page == null || size == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
-        }
-        List<Employee> paginatedResult = employeeService.getEmployeesWithPagination(page, size);
-        if (paginatedResult == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(paginatedResult);
+//        if (page == null || size == null) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
+//        }
+//        List<Employee> paginatedResult = employeeService.getEmployeesWithPagination(page, size);
+//        if (paginatedResult == null) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//        }
+        return ResponseEntity.status(HttpStatus.OK).body(employeeService.getEmployeesWithPagination(page, size));
     }
 }
