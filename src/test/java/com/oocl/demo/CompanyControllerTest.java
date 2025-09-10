@@ -1,10 +1,7 @@
 package com.oocl.demo;
 
-import com.oocl.demo.model.Company;
-
-import com.oocl.demo.model.Employee;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import com.oocl.demo.controller.CompanyController;
+import org.junit.jupiter.api.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,18 +13,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.TestMethodOrder;
-
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+//@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureMockMvc
 @SpringBootTest
 public class CompanyControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private CompanyController companyController;
+
+    @BeforeEach
+    public void resetForTesting() {
+        companyController.resetData();
+    }
+
+    private void addData(String requestBody) throws Exception {
+        mockMvc.perform(post("/companies")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+    }
+
     @Test
-    @Order(1)
+//    @Order(1)
     void should_create_company_when_post_given_a_valid_body() throws Exception {
         String requestBody = """
                     {
@@ -42,8 +50,16 @@ public class CompanyControllerTest {
     }
 
     @Test
-    @Order(2)
+//    @Order(2)
     void should_return_company_when_get_given_company_id() throws Exception {
+        String requestBody = """
+                    {
+                        "name": "Apple"
+                    }
+                """;
+        mockMvc.perform(post("/companies")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
         mockMvc.perform(get("/companies/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -52,7 +68,7 @@ public class CompanyControllerTest {
     }
 
     @Test
-    @Order(3)
+//    @Order(3)
     void should_throw_404_when_get_given_company_id_not_exist() throws Exception {
         mockMvc.perform(get("/companies/{id}", 2)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -60,17 +76,20 @@ public class CompanyControllerTest {
     }
 
     @Test
-    @Order(4)
+//    @Order(4)
     void should_return_company_list_when_get_given_companies() throws Exception {
         String requestBody = """
+                    {
+                        "name": "Apple"
+                    }
+                """;
+        addData(requestBody);
+        requestBody = """
                     {
                         "name": "Google"
                     }
                 """;
-        mockMvc.perform(post("/companies")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(requestBody));
-
+        addData(requestBody);
         mockMvc.perform(get("/companies/all")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -82,9 +101,21 @@ public class CompanyControllerTest {
     }
 
     @Test
-    @Order(5)
+//    @Order(5)
     void should_update_company_when_put_given_company_update_infos() throws Exception {
         String requestBody = """
+                    {
+                        "name": "Apple"
+                    }
+                """;
+        addData(requestBody);
+        requestBody = """
+                    {
+                        "name": "Google"
+                    }
+                """;
+        addData(requestBody);
+        requestBody = """
                     {
                         "name": "Meta"
                     }
@@ -98,7 +129,7 @@ public class CompanyControllerTest {
     }
 
     @Test
-    @Order(6)
+//    @Order(6)
     void should_throw_404_when_put_given_company_update_infos_not_exist() throws Exception {
         String requestBody = """
                     {
@@ -112,17 +143,23 @@ public class CompanyControllerTest {
     }
 
     @Test
-    @Order(7)
+//    @Order(7)
     void should_delete_company_when_delete_given_company_id() throws Exception {
-        mockMvc.perform(delete(("/companies/{id}"), 2)
+        String requestBody = """
+                    {
+                        "name": "Apple"
+                    }
+                """;
+        addData(requestBody);
+        mockMvc.perform(delete(("/companies/{id}"), 1)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(2))
-                .andExpect(jsonPath("$.name").value("Meta"));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Apple"));
     }
 
     @Test
-    @Order(8)
+//    @Order(8)
     void should_throw_204_company_when_delete_given_company_id_not_exist() throws Exception {
         mockMvc.perform(delete(("/companies/{id}"), 2)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -130,40 +167,38 @@ public class CompanyControllerTest {
     }
 
     @Test
-    @Order(9)
+//    @Order(9)
     void should_return_page_query_when_page_query_given_enough_companies() throws Exception {
         String requestBody = """
+                    {
+                        "name": "Apple"
+                    }
+                """;
+        addData(requestBody);
+        requestBody = """
                     {
                         "name": "Amazon"
                     }
                 """;
-        mockMvc.perform(post("/companies")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(requestBody));
+        addData(requestBody);
         requestBody = """
                     {
                         "name": "Netflix"
                     }
                 """;
-        mockMvc.perform(post("/companies")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(requestBody));
+        addData(requestBody);
         requestBody = """
                     {
                         "name": "X"
                     }
                 """;
-        mockMvc.perform(post("/companies")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(requestBody));
+        addData(requestBody);
         requestBody = """
                     {
                         "name": "Nvidia"
                     }
                 """;
-        mockMvc.perform(post("/companies")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(requestBody));
+        addData(requestBody);
         requestBody = """
                     {
                         "name": "AMD"
@@ -177,13 +212,13 @@ public class CompanyControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].name").value("Apple"))
-                .andExpect(jsonPath("$[1].id").value(3))
+                .andExpect(jsonPath("$[1].id").value(2))
                 .andExpect(jsonPath("$[1].name").value("Amazon"))
-                .andExpect(jsonPath("$[2].id").value(4))
+                .andExpect(jsonPath("$[2].id").value(3))
                 .andExpect(jsonPath("$[2].name").value("Netflix"))
-                .andExpect(jsonPath("$[3].id").value(5))
+                .andExpect(jsonPath("$[3].id").value(4))
                 .andExpect(jsonPath("$[3].name").value("X"))
-                .andExpect(jsonPath("$[4].id").value(6))
+                .andExpect(jsonPath("$[4].id").value(5))
                 .andExpect(jsonPath("$[4].name").value("Nvidia"));
     }
 }

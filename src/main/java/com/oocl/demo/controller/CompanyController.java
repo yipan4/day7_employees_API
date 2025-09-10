@@ -17,6 +17,11 @@ public class CompanyController {
     private final List<Company> companies = new ArrayList<>();
     private int currentUniqueId = 1;
 
+    public void resetData() {
+        currentUniqueId = 1;
+        companies.clear();
+    }
+
     @PostMapping("/companies")
     public Map<String, Object> createCompany(@RequestBody Company company) {
         company.setId(currentUniqueId);
