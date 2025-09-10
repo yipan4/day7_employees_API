@@ -29,7 +29,7 @@ public class EmployeeRepository {
 
     public Employee findEmployeeById(long id) {
         return employees.stream().filter(employee -> employee.getId() == id).findAny()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found"));
+                .orElse(null);
     }
 
     public List<Employee> getAllEmployees() {
@@ -39,9 +39,11 @@ public class EmployeeRepository {
     public Employee updateEmployee(long id, Employee employeeToBeUpdated) {
         Employee updatedEmployee = employees.stream().filter(employee ->
                         employee.getId() == id).findAny()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found"));
-        updatedEmployee.setAge(employeeToBeUpdated.getAge());
-        updatedEmployee.setSalary(employeeToBeUpdated.getSalary());
+                .orElse(null);
+        if (updatedEmployee != null) {
+            updatedEmployee.setAge(employeeToBeUpdated.getAge());
+            updatedEmployee.setSalary(employeeToBeUpdated.getSalary());
+        }
         return updatedEmployee;
     }
 
@@ -62,7 +64,7 @@ public class EmployeeRepository {
         int startingIndex = size*(page - 1);
         for (int i = startingIndex; i < startingIndex + size; i++) {
             if (i >= employees.size()) {
-                break;
+                return null;
             }
             paginationResult.add(employees.get(i));
         }

@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 public class EmployeeController {
-    private EmployeeService employeeService = new EmployeeService();
+    private final EmployeeService employeeService = new EmployeeService();
 
     public void resetData() {
         employeeService.resetData();
@@ -20,12 +20,22 @@ public class EmployeeController {
 
     @PostMapping("/employees")
     public ResponseEntity<Map<String, Long>> createEmployee(@RequestBody Employee employee) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.createEmployee(employee));
+        Map<String, Long> id = null;
+        try {
+            id = employeeService.createEmployee(employee);
+            return ResponseEntity.status(HttpStatus.CREATED).body(id);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping("/employees/{id}")
-    public Employee getEmployee(@PathVariable long id) {
-        return employeeService.getEmployeeById(id);
+    public ResponseEntity<Employee> getEmployee(@PathVariable long id) {
+        Employee foundEmployee = employeeService.getEmployeeById(id);
+        if (foundEmployee != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(foundEmployee);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @GetMapping("/employees/all")
@@ -34,8 +44,12 @@ public class EmployeeController {
     }
 
     @PutMapping("/employees/{id}")
-    public Employee updateEmployeeInfo(@PathVariable long id, @RequestBody Employee employeeToBeUpdated) {
-        return employeeService.updateEmployeeInfo(id, employeeToBeUpdated);
+    public ResponseEntity<Employee> updateEmployeeInfo(@PathVariable long id, @RequestBody Employee employeeToBeUpdated) {
+        Employee updatedEmployee = employeeService.updateEmployeeInfo(id, employeeToBeUpdated);
+        if (updatedEmployee != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(updatedEmployee);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @DeleteMapping("/employees/{id}")
@@ -58,6 +72,10 @@ public class EmployeeController {
         if (page == null || size == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
         }
-        return ResponseEntity.status(HttpStatus.OK).body(employeeService.getEmployeesWithPagination(page, size));
+        List<Employee> paginatedResult = employeeService.getEmployeesWithPagination(page, size);
+        if (paginatedResult == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(paginatedResult);
     }
 }

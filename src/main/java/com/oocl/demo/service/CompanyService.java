@@ -2,13 +2,7 @@ package com.oocl.demo.service;
 
 import com.oocl.demo.model.Company;
 import com.oocl.demo.repository.CompanyRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
