@@ -1,6 +1,7 @@
 package com.oocl.demo.service;
 
 import com.oocl.demo.model.Company;
+import com.oocl.demo.repository.CompanyRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,59 +13,35 @@ import java.util.List;
 import java.util.Map;
 
 public class CompanyService {
-    private final List<Company> companies = new ArrayList<>();
-    private int currentUniqueId = 1;
+    private CompanyRepository companyRepository = new CompanyRepository();
 
     public void resetData() {
-        currentUniqueId = 1;
-        companies.clear();
+        companyRepository.resetData();
     }
 
     public Map<String, Object> createCompany(Company company) {
-        company.setId(currentUniqueId);
-        currentUniqueId++;
-        companies.add(company);
+        company.setId(companyRepository.getNextUniqueId());
+        companyRepository.createCompany(company);
         return Map.of("id", company.getId());
     }
 
     public Company getCompanyById(long id) {
-        return companies.stream().filter(company -> company.getId() == id).findAny()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found"));
+        return companyRepository.findCompanyById(id);
     }
 
     public List<Company> getAllCompanies() {
-        return companies;
+        return companyRepository.getAllCompanies();
     }
 
-    public Company updateCompanyInfo(long id,Company updateCompany) {
-        Company updatedCompany = companies.stream().filter(company ->
-                        company.getId() == id).findAny()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found"));
-        updatedCompany.setName(updateCompany.getName());
-        return updatedCompany;
+    public Company updateCompanyInfo(long id, Company updateCompany) {
+        return companyRepository.updateCompany(id, updateCompany);
     }
 
-    public Company deleteCompany(@PathVariable long id) {
-        Iterator<Company> iter = companies.iterator();
-        while (iter.hasNext()) {
-            Company deletedCompany = iter.next();
-            if (deletedCompany.getId() == (id)) {
-                iter.remove();
-                return deletedCompany;
-            }
-        }
-        return null;
+    public Company deleteCompany(long id) {
+        return companyRepository.deleteCompany(id);
     }
 
-    public List<Company> getCompaniesPagination(@RequestParam int page, @RequestParam int size) {
-        List<Company> paginationResult = new ArrayList<>();
-        int startingIndex = size*(page - 1);
-        for (int i = startingIndex; i < startingIndex + size; i++) {
-            if (i >= companies.size()) {
-                break;
-            }
-            paginationResult.add(companies.get(i));
-        }
-        return paginationResult;
+    public List<Company> getCompaniesPagination(int page, int size) {
+        return companyRepository.queryCompanyWithPagination(page, size);
     }
 }
