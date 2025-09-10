@@ -160,4 +160,15 @@ class EmployeeServiceTest {
         verify(employeeRepository, times(1)).findEmployeeById(1);
         verify(employeeRepository, times(1)).updateEmployee(1, employee);
     }
+
+    @Test
+    void should_do_nothing_when_delete_given_employee_status_false() {
+        Employee employee = new Employee();
+        employee.setStatus(false);
+        when(employeeRepository.findEmployeeById(1)).thenReturn(employee);
+        Employee deletedEmployee = employeeService.deleteEmployee(1);
+        assertNull(deletedEmployee);
+        verify(employeeRepository, times(1)).findEmployeeById(1);
+        verify(employeeRepository, never()).updateEmployee(1, employee);
+    }
 }

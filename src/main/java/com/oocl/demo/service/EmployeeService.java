@@ -57,6 +57,9 @@ public class EmployeeService {
 
     public Employee deleteEmployee(long id) {
         Employee employee = employeeRepository.findEmployeeById(id);
+        if (!employee.getStatus()) {
+            return null;
+        }
         employee.setStatus(false);
         return employeeRepository.updateEmployee(id, employee);
 //        return employeeRepository.deleteEmployee(id);
