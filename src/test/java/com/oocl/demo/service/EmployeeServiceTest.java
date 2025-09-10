@@ -113,4 +113,18 @@ class EmployeeServiceTest {
         employeeService.createEmployee(employee);
         verify(employeeRepository, times(1)).createEmployee(any());
     }
+
+    @Test
+    void should_create_employee_when_post_given_employee_age_below_30_salary_below_20000() {
+        Employee employee = new Employee();
+        employee.setAge(28);
+        employee.setName("Tom");
+        employee.setGender("Male");
+        employee.setSalary(3000.0);
+        employeeService.createEmployee(employee);
+        verify(employeeRepository, times(1)).createEmployee(any());
+    }
+
+//    @Test
+//    void should_set_status_true_
 }
