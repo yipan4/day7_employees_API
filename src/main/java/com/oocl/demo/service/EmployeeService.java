@@ -27,6 +27,7 @@ public class EmployeeService {
             throw new EmployeeAgeAboveAndSalaryBelowThresholdException("Employee's age over 30 but salary below 20000.0");
         }
         employee.setId(employeeRepository.getNextUniqueId());
+        employee.setStatus(true);
         employeeRepository.createEmployee(employee);
         return Map.of("id", employee.getId());
     }

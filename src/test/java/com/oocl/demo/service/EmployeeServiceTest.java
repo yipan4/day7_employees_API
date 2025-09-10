@@ -80,7 +80,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void should_throw_error_when_post_given_employee_age_below_30_salary_below_20000() {
+    void should_throw_error_when_post_given_employee_age_above_30_salary_below_20000() {
         Employee employee = new Employee();
         employee.setAge(30);
         employee.setName("Tom");
@@ -90,5 +90,27 @@ class EmployeeServiceTest {
             employeeService.createEmployee(employee);
         });
         verify(employeeRepository, never()).createEmployee(any());
+    }
+
+    @Test
+    void should_create_employee_when_post_given_employee_age_above_30_salary_above_20000() {
+        Employee employee = new Employee();
+        employee.setAge(30);
+        employee.setName("Tom");
+        employee.setGender("Male");
+        employee.setSalary(30000.0);
+        employeeService.createEmployee(employee);
+        verify(employeeRepository, times(1)).createEmployee(any());
+    }
+
+    @Test
+    void should_create_employee_when_post_given_employee_age_below_30_salary_above_20000() {
+        Employee employee = new Employee();
+        employee.setAge(28);
+        employee.setName("Tom");
+        employee.setGender("Male");
+        employee.setSalary(30000.0);
+        employeeService.createEmployee(employee);
+        verify(employeeRepository, times(1)).createEmployee(any());
     }
 }
