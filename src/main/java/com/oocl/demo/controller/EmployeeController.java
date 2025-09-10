@@ -16,6 +16,11 @@ public class EmployeeController {
     private final List<Employee> employees = new ArrayList<>();
     private int currentUniqueId = 1;
 
+    public void resetData() {
+        currentUniqueId = 1;
+        employees.clear();
+    }
+
     @PostMapping("/employees")
     public Map<String, Object> createEmployee(@RequestBody Employee employee) {
         employee.setId(currentUniqueId);

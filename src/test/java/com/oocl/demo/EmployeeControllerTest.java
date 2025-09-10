@@ -1,9 +1,9 @@
 package com.oocl.demo;
 
+import com.oocl.demo.controller.EmployeeController;
 import com.oocl.demo.model.Employee;
 
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,15 +14,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.TestMethodOrder;
-
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+//@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureMockMvc
 @SpringBootTest
 public class EmployeeControllerTest {
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private EmployeeController employeeController;
+
+    @BeforeEach
+    public void resetData() {
+        employeeController.resetData();
+    }
 
     private Employee johnSmith() {
         return new Employee(1, "John Smith", 30, "MALE", 60000);
@@ -56,8 +61,14 @@ public class EmployeeControllerTest {
         return new Employee(7, "Daniel Clarkson", 32, "MALE", 65000);
     }
 
+    private void addData(String requestBody) throws Exception {
+        mockMvc.perform(post("/employees")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody));
+    }
+
     @Test
-    @Order(1)
+//    @Order(1)
     void should_create_employee_when_post_given_a_valid_body() throws Exception {
         String requestBody = """
                     {
@@ -75,8 +86,17 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    @Order(2)
+//    @Order(2)
     void should_return_employee_when_get_given_employee_id() throws Exception {
+        String requestBody = """
+                    {
+                        "name": "John Smith",
+                        "age": 30,
+                        "gender": "MALE",
+                        "salary": 60000
+                    }
+                """;
+        addData(requestBody);
         mockMvc.perform(get("/employees/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -88,9 +108,18 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    @Order(3)
+//    @Order(3)
     void should_return_male_employee_when_get_given_gender_male() throws Exception {
         String requestBody = """
+                    {
+                        "name": "John Smith",
+                        "age": 30,
+                        "gender": "MALE",
+                        "salary": 60000
+                    }
+                """;
+        addData(requestBody);
+        requestBody = """
                     {
                         "name": "Mary Jane",
                         "age": 28,
@@ -98,6 +127,7 @@ public class EmployeeControllerTest {
                         "salary": 65000
                     }
                 """;
+        addData(requestBody);
         Employee expectedEmployee = johnSmith();
         mockMvc.perform(post("/employees")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -115,8 +145,26 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    @Order(4)
+//    @Order(4)
     void should_return_female_employee_when_get_given_gender_female() throws Exception {
+        String requestBody = """
+                    {
+                        "name": "John Smith",
+                        "age": 30,
+                        "gender": "MALE",
+                        "salary": 60000
+                    }
+                """;
+        addData(requestBody);
+        requestBody = """
+                    {
+                        "name": "Mary Jane",
+                        "age": 28,
+                        "gender": "FEMALE",
+                        "salary": 65000
+                    }
+                """;
+        addData(requestBody);
         Employee expectedEmployee = maryJane();
         mockMvc.perform(get("/employees?gender=female")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -129,8 +177,26 @@ public class EmployeeControllerTest {
                 .andExpect(jsonPath("$[0].salary").value(expectedEmployee.getSalary()));
     }
     @Test
-    @Order(5)
+//    @Order(5)
     void should_return_employee_list_when_get_given_employees() throws Exception {
+        String requestBody = """
+                    {
+                        "name": "John Smith",
+                        "age": 30,
+                        "gender": "MALE",
+                        "salary": 60000
+                    }
+                """;
+        addData(requestBody);
+        requestBody = """
+                    {
+                        "name": "Mary Jane",
+                        "age": 28,
+                        "gender": "FEMALE",
+                        "salary": 65000
+                    }
+                """;
+        addData(requestBody);
         Employee expectedEmployee_1 = johnSmith();
         Employee expectedEmployee_2 = maryJane();
         mockMvc.perform(get("/employees/all")
@@ -149,10 +215,28 @@ public class EmployeeControllerTest {
                 .andExpect(jsonPath("$[1].salary").value(expectedEmployee_2.getSalary()));
     }
     @Test
-    @Order(6)
+//    @Order(6)
     void should_update_employee_when_put_given_employee_update_infos() throws Exception {
-        Employee updatedEmployee = newJohnSmith();
         String requestBody = """
+                    {
+                        "name": "John Smith",
+                        "age": 30,
+                        "gender": "MALE",
+                        "salary": 60000
+                    }
+                """;
+        addData(requestBody);
+        requestBody = """
+                    {
+                        "name": "Mary Jane",
+                        "age": 28,
+                        "gender": "FEMALE",
+                        "salary": 65000
+                    }
+                """;
+        addData(requestBody);
+        Employee updatedEmployee = newJohnSmith();
+        requestBody = """
                     {
                         "age": 31,
                         "salary": 70000
@@ -170,8 +254,26 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    @Order(7)
+//    @Order(7)
     void should_delete_employee_when_delete_given_employee_exists() throws Exception {
+        String requestBody = """
+                    {
+                        "name": "John Smith",
+                        "age": 30,
+                        "gender": "MALE",
+                        "salary": 60000
+                    }
+                """;
+        addData(requestBody);
+        requestBody = """
+                    {
+                        "name": "Mary Jane",
+                        "age": 28,
+                        "gender": "FEMALE",
+                        "salary": 65000
+                    }
+                """;
+        addData(requestBody);
         Employee updatedEmployee = maryJane();
         mockMvc.perform(delete("/employees/{id}",2)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -184,18 +286,44 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    @Order(8)
+//    @Order(8)
     void should_return_204_employee_when_delete_given_employee_not_exists() throws Exception {
-        Employee updatedEmployee = maryJane();
+        String requestBody = """
+                    {
+                        "name": "John Smith",
+                        "age": 30,
+                        "gender": "MALE",
+                        "salary": 60000
+                    }
+                """;
+        addData(requestBody);
         mockMvc.perform(delete("/employees/{id}",2)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    @Order(9)
+//    @Order(9)
     void should_return_page_query_when_page_query_given_enough_employees() throws Exception {
         String requestBody = """
+                    {
+                        "name": "John Smith",
+                        "age": 30,
+                        "gender": "MALE",
+                        "salary": 60000
+                    }
+                """;
+        addData(requestBody);
+        requestBody = """
+                    {
+                        "name": "Mary Jane",
+                        "age": 28,
+                        "gender": "FEMALE",
+                        "salary": 65000
+                    }
+                """;
+        addData(requestBody);
+        requestBody = """
                     {
                         "name": "Ben Smith",
                         "age": 30,
@@ -203,9 +331,7 @@ public class EmployeeControllerTest {
                         "salary": 50000
                     }
                 """;
-        mockMvc.perform(post("/employees")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(requestBody));
+        addData(requestBody);
         requestBody = """
                     {
                         "name": "Amy Smith",
@@ -214,9 +340,7 @@ public class EmployeeControllerTest {
                         "salary": 80000
                     }
                 """;
-        mockMvc.perform(post("/employees")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(requestBody));
+        addData(requestBody);
         requestBody = """
                     {
                         "name": "Ann Clarkson",
@@ -225,9 +349,7 @@ public class EmployeeControllerTest {
                         "salary": 55000
                     }
                 """;
-        mockMvc.perform(post("/employees")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(requestBody));
+        addData(requestBody);
         requestBody = """
                     {
                         "name": "Clara Smith",
@@ -236,9 +358,7 @@ public class EmployeeControllerTest {
                         "salary": 85000
                     }
                 """;
-        mockMvc.perform(post("/employees")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(requestBody));
+        addData(requestBody);
         requestBody = """
                     {
                         "name": "Daniel Clarkson",
@@ -247,14 +367,12 @@ public class EmployeeControllerTest {
                         "salary": 65000
                     }
                 """;
-        mockMvc.perform(post("/employees")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(requestBody));
-        Employee expectedEmployee_1 = newJohnSmith();
-        Employee expectedEmployee_2 = benSmith();
-        Employee expectedEmployee_3 = amySmith();
-        Employee expectedEmployee_4 = annClarkson();
-        Employee expectedEmployee_5 = claraSmith();
+        addData(requestBody);
+        Employee expectedEmployee_1 = johnSmith();
+        Employee expectedEmployee_2 = maryJane();
+        Employee expectedEmployee_3 = benSmith();
+        Employee expectedEmployee_4 = amySmith();
+        Employee expectedEmployee_5 = annClarkson();
         mockMvc.perform(get("/employees-page?page=1&size=5")
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.length()").value(5))
