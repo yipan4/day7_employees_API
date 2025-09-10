@@ -2,6 +2,8 @@ package com.oocl.demo.controller;
 
 import com.oocl.demo.model.Company;
 import com.oocl.demo.service.CompanyService;
+import org.apache.coyote.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +12,8 @@ import java.util.Map;
 
 @RestController
 public class CompanyController {
-    private CompanyService companyService = new CompanyService();
+    @Autowired
+    private CompanyService companyService;
 
     public void resetData() {
         companyService.resetData();
@@ -22,8 +25,8 @@ public class CompanyController {
     }
 
     @GetMapping("/companies/{id}")
-    public Company getCompany(@PathVariable long id) {
-        return companyService.getCompanyById(id);
+    public ResponseEntity<Company> getCompany(@PathVariable long id) {
+        return ResponseEntity.ok(companyService.getCompanyById(id));
     }
 
     @GetMapping("/companies/all")
@@ -32,24 +35,17 @@ public class CompanyController {
     }
 
     @PutMapping("/companies/{id}")
-    public Company updateCompanyInfo(@PathVariable long id, @RequestBody Company updateCompany) {
-        return companyService.updateCompanyInfo(id, updateCompany);
+    public ResponseEntity<Company> updateCompanyInfo(@PathVariable long id, @RequestBody Company updateCompany) {
+        return ResponseEntity.ok(companyService.updateCompanyInfo(id, updateCompany));
     }
 
     @DeleteMapping("/companies/{id}")
     public ResponseEntity<Company> deleteCompany(@PathVariable long id) {
-        Company deletedCompany = companyService.deleteCompany(id);
-        if (deletedCompany == null) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(deletedCompany);
+        return ResponseEntity.status(HttpStatus.OK).body(companyService.deleteCompany(id));
     }
 
     @GetMapping("/companies")
     public ResponseEntity<List<Company>> getCompaniesPagination(@RequestParam Integer page, @RequestParam Integer size) {
-        if (page == null || size == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
         return ResponseEntity.status(HttpStatus.OK).body(companyService.getCompaniesPagination(page, size));
     }
 }

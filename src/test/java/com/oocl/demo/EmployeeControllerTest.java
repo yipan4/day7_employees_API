@@ -254,6 +254,9 @@ public class EmployeeControllerTest {
         Employee updatedEmployee = newJohnSmith();
         requestBody = """
                     {
+                        "id": 1,
+                        "name": "John Smith",
+                        "gender": "MALE",
                         "age": 31,
                         "salary": 70000
                     }
@@ -315,7 +318,7 @@ public class EmployeeControllerTest {
         addData(requestBody);
         mockMvc.perform(delete("/employees/{id}",2)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNotFound());
     }
 
     @Test

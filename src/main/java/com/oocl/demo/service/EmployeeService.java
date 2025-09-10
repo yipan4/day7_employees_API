@@ -61,8 +61,11 @@ public class EmployeeService {
 
     public Employee deleteEmployee(long id) {
         Employee employee = employeeRepository.findEmployeeById(id);
+        if (employee == null) {
+            throw new EmployeeNotFoundException("Employee with ID %s not found.".formatted(id));
+        }
         if (!employee.getStatus()) {
-            return null;
+            throw new EmployeeInactiveException("Employee status is false. Cannot delete.");
         }
         employee.setStatus(false);
         return employeeRepository.updateEmployee(id, employee);

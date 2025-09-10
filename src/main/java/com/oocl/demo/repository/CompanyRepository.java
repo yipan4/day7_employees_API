@@ -29,7 +29,7 @@ public class CompanyRepository {
 
     public Company findCompanyById(long id) {
         return companies.stream().filter(company -> company.getId() == id).findAny()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found"));
+                .orElse(null);
     }
 
     public List<Company> getAllCompanies() {
@@ -39,7 +39,10 @@ public class CompanyRepository {
     public Company updateCompany(long id, Company updateCompany) {
         Company updatedCompany = companies.stream().filter(company ->
                         company.getId() == id).findAny()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found"));
+                .orElse(null);
+        if (updatedCompany == null) {
+            return null;
+        }
         updatedCompany.setName(updateCompany.getName());
         return updatedCompany;
     }
@@ -59,6 +62,9 @@ public class CompanyRepository {
     public List<Company> queryCompanyWithPagination(int page, int size) {
         List<Company> paginationResult = new ArrayList<>();
         int startingIndex = size*(page - 1);
+        if (startingIndex < 0 ) {
+            return null;
+        }
         for (int i = startingIndex; i < startingIndex + size; i++) {
             if (i >= companies.size()) {
                 break;

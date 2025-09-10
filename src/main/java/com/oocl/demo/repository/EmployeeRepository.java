@@ -42,14 +42,13 @@ public class EmployeeRepository {
     }
 
     public Employee updateEmployee(long id, Employee employeeToBeUpdated) {
-        Employee updatedEmployee = employees.stream().filter(employee ->
-                        employee.getId() == id).findAny()
-                .orElse(null);
-        if (updatedEmployee != null) {
-            updatedEmployee.setAge(employeeToBeUpdated.getAge());
-            updatedEmployee.setSalary(employeeToBeUpdated.getSalary());
+        for (int i = 0; i < employees.size(); i++) {
+            if (employees.get(i).getId() == employeeToBeUpdated.getId()) {
+                employees.set(i, employeeToBeUpdated);
+                return employees.get(i);
+            }
         }
-        return updatedEmployee;
+        return null;
     }
 
     public Employee deleteEmployee(long id) {

@@ -2,12 +2,16 @@ package com.oocl.demo.service;
 
 import com.oocl.demo.model.Company;
 import com.oocl.demo.repository.CompanyRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class CompanyService {
-    private CompanyRepository companyRepository = new CompanyRepository();
+    @Autowired
+    private CompanyRepository companyRepository;
 
     public void resetData() {
         companyRepository.resetData();
@@ -20,7 +24,11 @@ public class CompanyService {
     }
 
     public Company getCompanyById(long id) {
-        return companyRepository.findCompanyById(id);
+        Company company = companyRepository.findCompanyById(id);
+        if (company == null) {
+            throw new CompanyNotFoundException("Company with ID %s not found".formatted(id));
+        }
+        return company;
     }
 
     public List<Company> getAllCompanies() {
@@ -28,14 +36,29 @@ public class CompanyService {
     }
 
     public Company updateCompanyInfo(long id, Company updateCompany) {
-        return companyRepository.updateCompany(id, updateCompany);
+        Company updatedCompany = companyRepository.updateCompany(id, updateCompany);
+        if (updatedCompany == null) {
+            throw new CompanyNotFoundException("Company with ID %s not found".formatted(id));
+        }
+        return updatedCompany;
     }
 
     public Company deleteCompany(long id) {
-        return companyRepository.deleteCompany(id);
+        Company deletedCompany = companyRepository.deleteCompany(id);
+        if (deletedCompany == null) {
+            throw new CompanyNotExistWhenDelete("Company with ID %s not found".formatted(id));
+        }
+        return deletedCompany;
     }
 
-    public List<Company> getCompaniesPagination(int page, int size) {
-        return companyRepository.queryCompanyWithPagination(page, size);
+    public List<Company> getCompaniesPagination(Integer page, Integer size) {
+        if (page == null || size == null) {
+            throw new CompanyPaginationQueryRangeExceedException("Page and size cannot be null");
+        }
+        List<Company> paginationResult = companyRepository.queryCompanyWithPagination(page, size);
+        if (paginationResult == null ) {
+            throw new CompanyPaginationQueryRangeExceedException("Page and size cannot be negative");
+        }
+        return paginationResult;
     }
 }

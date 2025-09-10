@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.oocl.demo.model.Employee;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,13 +52,6 @@ public class EmployeeController {
         if (gender != null) {
             return ResponseEntity.status(HttpStatus.OK).body(employeeService.getEmployeesByGender(gender));
         }
-//        if (page == null || size == null) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
-//        }
-//        List<Employee> paginatedResult = employeeService.getEmployeesWithPagination(page, size);
-//        if (paginatedResult == null) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-//        }
         return ResponseEntity.status(HttpStatus.OK).body(employeeService.getEmployeesWithPagination(page, size));
     }
 }
