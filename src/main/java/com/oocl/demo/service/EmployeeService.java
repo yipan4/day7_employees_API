@@ -17,6 +17,10 @@ public class EmployeeService {
         employeeRepository.resetData();
     }
 
+    public boolean isEmployeeDuplicatedByNameAndGender(Employee employee) {
+        return employeeRepository.isEmployeeDuplicatedByNameAndGender(employee);
+    }
+
     public Map<String, Long> createEmployee(Employee employee) {
         int age = employee.getAge();
         double salary = employee.getSalary();
@@ -25,6 +29,9 @@ public class EmployeeService {
         }
         if (age >= 30 && salary < 20000.0) {
             throw new EmployeeAgeAboveAndSalaryBelowThresholdException("Employee's age over 30 but salary below 20000.0");
+        }
+        if (isEmployeeDuplicatedByNameAndGender(employee)) {
+            throw new EmployeeDuplicateCreationException("Employee with same name and gender exists");
         }
         employee.setId(employeeRepository.getNextUniqueId());
         employee.setStatus(true);

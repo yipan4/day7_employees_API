@@ -21,6 +21,13 @@ public class EmployeeRepository {
         return currentUniqueId++;
     }
 
+    public boolean isEmployeeDuplicatedByNameAndGender(Employee newEmployee) {
+        return employees.stream()
+                .anyMatch(employee ->
+                        employee.getName().equalsIgnoreCase(newEmployee.getName()) &&
+                                employee.getGender().equalsIgnoreCase(newEmployee.getGender()));
+    }
+
     public void createEmployee(Employee employee) {
         employees.add(employee);
     }

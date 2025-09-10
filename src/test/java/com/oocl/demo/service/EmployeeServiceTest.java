@@ -136,4 +136,17 @@ class EmployeeServiceTest {
         assertTrue(employee.getStatus());
         verify(employeeRepository, times(1)).createEmployee(any());
     }
+
+    @Test
+    void should_throw_error_when_post_given_employee_with_same_name_and_gender() {
+        Employee employee = new Employee();
+        employee.setAge(30);
+        employee.setName("Tom");
+        employee.setGender("Male");
+        employee.setSalary(40000.0);
+        when(employeeRepository.isEmployeeDuplicatedByNameAndGender(employee)).thenReturn(true);
+        assertThrows(EmployeeDuplicateCreationException.class, () ->
+                employeeService.createEmployee(employee));
+        verify(employeeRepository, never()).createEmployee(any());
+    }
 }
