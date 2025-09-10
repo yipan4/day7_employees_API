@@ -73,9 +73,22 @@ class EmployeeServiceTest {
     void should_throw_error_when_get_given_employee_id_not_exist() {
         when(employeeRepository.findEmployeeById(1)).thenReturn(null);
 
-        assertThrows(EmployeeIdNotFoundException.class, () ->
+        assertThrows(EmployeeNotFoundException.class, () ->
                 employeeService.getEmployeeById(1));
 
         verify(employeeRepository, times(1)).findEmployeeById(anyLong());
+    }
+
+    @Test
+    void should_throw_error_when_post_given_employee_age_below_30_salary_below_20000() {
+        Employee employee = new Employee();
+        employee.setAge(30);
+        employee.setName("Tom");
+        employee.setGender("Male");
+        employee.setSalary(3000.0);
+        assertThrows(EmployeeAgeAboveAndSalaryBelowThresholdException.class, () -> {
+            employeeService.createEmployee(employee);
+        });
+        verify(employeeRepository, never()).createEmployee(any());
     }
 }

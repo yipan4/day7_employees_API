@@ -19,8 +19,12 @@ public class EmployeeService {
 
     public Map<String, Long> createEmployee(Employee employee) {
         int age = employee.getAge();
+        double salary = employee.getSalary();
         if (age < 18 || age > 65) {
             throw new EmployeeNotAmongLegalAgeException("Employee's age not valid");
+        }
+        if (age >= 30 && salary < 20000.0) {
+            throw new EmployeeAgeAboveAndSalaryBelowThresholdException("Employee's age over 30 but salary below 20000.0");
         }
         employee.setId(employeeRepository.getNextUniqueId());
         employeeRepository.createEmployee(employee);
@@ -30,7 +34,7 @@ public class EmployeeService {
     public Employee getEmployeeById(long id) {
         Employee employee = employeeRepository.findEmployeeById(id);
         if (employee == null) {
-            throw new EmployeeIdNotFoundException("Employee ID not found.");
+            throw new EmployeeNotFoundException("Employee with ID %s not found.".formatted(id));
         }
         return employee;
     }
