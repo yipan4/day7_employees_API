@@ -31,11 +31,13 @@ public class EmployeeController {
 
     @GetMapping("/employees/{id}")
     public ResponseEntity<Employee> getEmployee(@PathVariable long id) {
-        Employee foundEmployee = employeeService.getEmployeeById(id);
-        if (foundEmployee != null) {
+        Employee foundEmployee = null;
+        try {
+            foundEmployee = employeeService.getEmployeeById(id);
             return ResponseEntity.status(HttpStatus.OK).body(foundEmployee);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @GetMapping("/employees/all")

@@ -2,6 +2,7 @@ package com.oocl.demo.service;
 
 import com.oocl.demo.model.Employee;
 import com.oocl.demo.repository.EmployeeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,7 +10,8 @@ import java.util.Map;
 
 @Service
 public class EmployeeService {
-    private final EmployeeRepository employeeRepository = new EmployeeRepository();
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
     public void resetData() {
         employeeRepository.resetData();
@@ -26,7 +28,11 @@ public class EmployeeService {
     }
 
     public Employee getEmployeeById(long id) {
-        return employeeRepository.findEmployeeById(id);
+        Employee employee = employeeRepository.findEmployeeById(id);
+        if (employee == null) {
+            throw new EmployeeIdNotFoundException("Employee ID not found.");
+        }
+        return employee;
     }
 
     public List<Employee> getAllEmployee() {
