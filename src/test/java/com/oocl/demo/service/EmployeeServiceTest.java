@@ -125,6 +125,15 @@ class EmployeeServiceTest {
         verify(employeeRepository, times(1)).createEmployee(any());
     }
 
-//    @Test
-//    void should_set_status_true_
+    @Test
+    void should_set_status_true_when_post_given_new_employee() {
+        Employee employee = new Employee();
+        employee.setAge(28);
+        employee.setName("Tom");
+        employee.setGender("Male");
+        employee.setSalary(30000.0);
+        employeeService.createEmployee(employee);
+        assertTrue(employee.getStatus());
+        verify(employeeRepository, times(1)).createEmployee(any());
+    }
 }
