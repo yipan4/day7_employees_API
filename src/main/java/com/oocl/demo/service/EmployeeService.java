@@ -52,6 +52,10 @@ public class EmployeeService {
     }
 
     public Employee updateEmployeeInfo(long id, Employee employeeToBeUpdated) {
+        Employee foundEmployee = employeeRepository.findEmployeeById(id);
+        if (!foundEmployee.getStatus()) {
+            return null;
+        }
         return employeeRepository.updateEmployee(id, employeeToBeUpdated);
     }
 

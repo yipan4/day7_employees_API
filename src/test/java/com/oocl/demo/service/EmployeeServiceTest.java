@@ -171,4 +171,15 @@ class EmployeeServiceTest {
         verify(employeeRepository, times(1)).findEmployeeById(1);
         verify(employeeRepository, never()).updateEmployee(1, employee);
     }
+
+    @Test
+    void should_do_nothing_when_update_given_employee_status_false() {
+        Employee employee = new Employee();
+        employee.setStatus(false);
+        when(employeeRepository.findEmployeeById(1)).thenReturn(employee);
+        Employee updatedEmployee = employeeService.updateEmployeeInfo(1, employee);
+        assertNull(updatedEmployee);
+        verify(employeeRepository, times(1)).findEmployeeById(1);
+        verify(employeeRepository, never()).updateEmployee(1, employee);
+    }
 }
