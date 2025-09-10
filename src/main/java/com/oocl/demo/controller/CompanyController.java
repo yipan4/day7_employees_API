@@ -63,7 +63,7 @@ public class CompanyController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
-    @GetMapping("/companies-page")
+    @GetMapping("/companies")
     public List<Company> getCompaniesPagination(@RequestParam int page, @RequestParam int size) {
         List<Company> paginationResult = new ArrayList<>();
         int startingIndex = size*(page - 1);

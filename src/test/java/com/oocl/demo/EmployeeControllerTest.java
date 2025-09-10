@@ -81,7 +81,7 @@ public class EmployeeControllerTest {
         mockMvc.perform(post("/employees")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(requestBody))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1));
     }
 
@@ -373,7 +373,7 @@ public class EmployeeControllerTest {
         Employee expectedEmployee_3 = benSmith();
         Employee expectedEmployee_4 = amySmith();
         Employee expectedEmployee_5 = annClarkson();
-        mockMvc.perform(get("/employees-page?page=1&size=5")
+        mockMvc.perform(get("/employees?page=1&size=5")
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.length()").value(5))
                 .andExpect(jsonPath("$[0].id").value(expectedEmployee_1.getId()))

@@ -208,7 +208,7 @@ public class CompanyControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(requestBody));
 
-        mockMvc.perform(get("/companies-page?page=1&size=5")
+        mockMvc.perform(get("/companies?page=1&size=5")
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].name").value("Apple"))

@@ -1,5 +1,7 @@
 package com.oocl.demo.controller;
 
+import com.oocl.demo.service.EmployeeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,81 +15,52 @@ import java.util.Map;
 
 @RestController
 public class EmployeeController {
-    private final List<Employee> employees = new ArrayList<>();
-    private int currentUniqueId = 1;
+    private EmployeeService employeeService = new EmployeeService();
 
     public void resetData() {
-        currentUniqueId = 1;
-        employees.clear();
+        employeeService.resetData();
     }
 
     @PostMapping("/employees")
-    public Map<String, Object> createEmployee(@RequestBody Employee employee) {
-        employee.setId(currentUniqueId);
-        currentUniqueId++;
-        employees.add(employee);
-        return Map.of("id", employee.getId());
-    }
-
-    @PostMapping("/employees-custom-status-code")
-    public ResponseEntity<Map<String, Long>> createEmployeeWithCustomStatusCode(@RequestBody Employee employee) {
-        employee.setId(currentUniqueId);
-        currentUniqueId++;
-        employees.add(employee);
-        Map<String, Long> result = Map.of("id", employee.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    public ResponseEntity<Map<String, Long>> createEmployee(@RequestBody Employee employee) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.createEmployee(employee));
     }
 
     @GetMapping("/employees/{id}")
     public Employee getEmployee(@PathVariable long id) {
-        return employees.stream().filter(employee -> employee.getId() == id).findAny()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found"));
-    }
-
-    @GetMapping("/employees")
-    public List<Employee> queryEmployeeByGender(@RequestParam String gender) {
-        return employees.stream().filter(employee -> employee.getGender().
-                equalsIgnoreCase(gender)).toList();
+        return employeeService.getEmployeeById(id);
     }
 
     @GetMapping("/employees/all")
     public List<Employee> getAllEmployees() {
-        return employees;
+        return employeeService.getAllEmployee();
     }
 
     @PutMapping("/employees/{id}")
     public Employee updateEmployeeInfo(@PathVariable long id, @RequestBody Employee employeeToBeUpdated) {
-        Employee updatedEmployee = employees.stream().filter(employee ->
-                        employee.getId() == id).findAny()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found"));
-        updatedEmployee.setAge(employeeToBeUpdated.getAge());
-        updatedEmployee.setSalary(employeeToBeUpdated.getSalary());
-        return updatedEmployee;
+        return employeeService.updateEmployeeInfo(id, employeeToBeUpdated);
     }
 
     @DeleteMapping("/employees/{id}")
     public ResponseEntity<Employee> deleteEmployee(@PathVariable long id) {
-        Iterator<Employee> iter = employees.iterator();
-        while (iter.hasNext()) {
-            Employee deletedEmployee = iter.next();
-            if (deletedEmployee.getId() == (id)) {
-                iter.remove();
-                return ResponseEntity.status(HttpStatus.OK).body(deletedEmployee);
-            }
+        Employee deletedEmployee = employeeService.deleteEmployee(id);
+        if (deletedEmployee == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        return ResponseEntity.status(HttpStatus.OK).body(deletedEmployee);
     }
 
-    @GetMapping("/employees-page")
-    public List<Employee> getEmployeesPagination(@RequestParam int page, @RequestParam int size) {
-        List<Employee> paginationResult = new ArrayList<>();
-        int startingIndex = size*(page - 1);
-        for (int i = startingIndex; i < startingIndex + size; i++) {
-            if (i >= employees.size()) {
-                break;
-            }
-            paginationResult.add(employees.get(i));
+    @GetMapping("/employees")
+    public ResponseEntity<List<Employee>> getEmployeesPagination(
+            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        if (gender != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(employeeService.getEmployeesByGender(gender));
         }
-        return paginationResult;
+        if (page == null || size == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ArrayList<>());
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(employeeService.getEmployeesWithPagination(page, size));
     }
 }
