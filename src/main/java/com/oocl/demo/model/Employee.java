@@ -14,6 +14,9 @@ public class Employee {
     private String gender;
     private boolean status;
 
+    @Column(name = "company_id")
+    private long companyId;
+
     public Employee() {};
     public Employee (int id, String name, int age, String gender, double salary) {
         this.id = id;
@@ -69,5 +72,17 @@ public class Employee {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(long companyId) {
+        this.companyId = companyId;
     }
 }

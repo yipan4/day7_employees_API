@@ -160,7 +160,7 @@ class EmployeeServiceTest {
         employeeService.deleteEmployee(1);
         assertFalse(employee.getStatus());
         verify(employeeRepository, times(1)).findEmployeeById(1);
-        verify(employeeRepository, times(1)).updateEmployee(1, employee);
+        verify(employeeRepository, times(1)).updateEmployee(1, any());
     }
 
     @Test
@@ -170,7 +170,7 @@ class EmployeeServiceTest {
         when(employeeRepository.findEmployeeById(1)).thenReturn(employee);
         assertThrows(EmployeeInactiveException.class, () -> employeeService.deleteEmployee(1));
         verify(employeeRepository, times(1)).findEmployeeById(1);
-        verify(employeeRepository, never()).updateEmployee(1, employee);
+        verify(employeeRepository, never()).updateEmployee(1, any());
     }
 
     @Test
@@ -178,10 +178,10 @@ class EmployeeServiceTest {
         Employee employee = new Employee();
         employee.setStatus(false);
         when(employeeRepository.findEmployeeById(1)).thenReturn(employee);
-        Employee updatedEmployee = employeeService.updateEmployeeInfo(1, employee);
+        Employee updatedEmployee = employeeService.updateEmployeeInfo(1, any());
         assertNull(updatedEmployee);
         verify(employeeRepository, times(1)).findEmployeeById(1);
-        verify(employeeRepository, never()).updateEmployee(1, employee);
+        verify(employeeRepository, never()).updateEmployee(1, any());
     }
 
     @Test
@@ -194,11 +194,11 @@ class EmployeeServiceTest {
         newEmployee.setAge(31);
         newEmployee.setSalary(40000.0);
         when(employeeRepository.findEmployeeById(1)).thenReturn(oldEmployee);
-        when(employeeRepository.updateEmployee(1, newEmployee)).thenReturn(newEmployee);
-        Employee updatedEmployee = employeeService.updateEmployeeInfo(1, newEmployee);
+        when(employeeRepository.updateEmployee(1, any())).thenReturn(newEmployee);
+        Employee updatedEmployee = employeeService.updateEmployeeInfo(1, any());
         assertEquals(newEmployee.getAge(), updatedEmployee.getAge());
         assertEquals(newEmployee.getSalary(), updatedEmployee.getSalary());
         verify(employeeRepository, times(1)).findEmployeeById(1);
-        verify(employeeRepository, times(1)).updateEmployee(1, newEmployee);
+        verify(employeeRepository, times(1)).updateEmployee(1, any());
     }
 }

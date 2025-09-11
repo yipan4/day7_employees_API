@@ -1,6 +1,11 @@
 package com.oocl.demo;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oocl.demo.controller.CompanyController;
+import com.oocl.demo.model.Company;
+import com.oocl.demo.model.Employee;
+import com.oocl.demo.repository.CompanyRepository;
+import com.oocl.demo.repository.EmployeeRepository;
 import org.junit.jupiter.api.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -23,15 +30,52 @@ public class CompanyControllerTest {
     @Autowired
     private CompanyController companyController;
 
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
     @BeforeEach
     public void resetForTesting() {
         companyController.resetData();
     }
 
-    private void addData(String requestBody) throws Exception {
-        mockMvc.perform(post("/companies")
+    private ResultActions mockMvcPerformPost(String requestBody) throws Exception {
+        return mockMvc.perform(post("/companies")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(requestBody));
+    }
+
+    private long addData(String requestBody) throws Exception {
+        ResultActions resultActions = mockMvcPerformPost(requestBody);
+        MvcResult mvcResult = resultActions.andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        return new ObjectMapper().readTree(contentAsString).get("id").asLong();
+    }
+
+    @Test
+    void should_return_company_with_employees() throws Exception {
+        String requestBody = """
+                    {
+                        "name": "Apple"
+                    }
+                """;
+        long id = addData(requestBody);
+        Employee employee = new Employee();
+        employee.setAge(30);
+        employee.setGender("Male");
+        employee.setSalary(80000);
+        employee.setName("Tom");
+        employee.setCompanyId(id);
+        employeeRepository.createEmployee(employee);
+
+        mockMvc.perform(get("/companies/{id}", id).
+                        contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.name").value("Apple"))
+                .andExpect(jsonPath("$.employees.length()").value(1));
     }
 
     @Test
@@ -42,11 +86,12 @@ public class CompanyControllerTest {
                         "name": "Apple"
                     }
                 """;
-        mockMvc.perform(post("/companies")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(requestBody))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+        ResultActions resultActions = mockMvcPerformPost(requestBody);
+        MvcResult mvcResult = resultActions.andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        long id = new ObjectMapper().readTree(contentAsString).get("id").asLong();
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id));
     }
 
     @Test
@@ -57,13 +102,11 @@ public class CompanyControllerTest {
                         "name": "Apple"
                     }
                 """;
-        mockMvc.perform(post("/companies")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(requestBody));
-        mockMvc.perform(get("/companies/{id}", 1)
+        long id = addData(requestBody);
+        mockMvc.perform(get("/companies/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.name").value("Apple"));
     }
 
@@ -83,20 +126,20 @@ public class CompanyControllerTest {
                         "name": "Apple"
                     }
                 """;
-        addData(requestBody);
+        long id1 = addData(requestBody);
         requestBody = """
                     {
                         "name": "Google"
                     }
                 """;
-        addData(requestBody);
+        long id2 = addData(requestBody);
         mockMvc.perform(get("/companies/all")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].id").value(id1))
                 .andExpect(jsonPath("$[0].name").value("Apple"))
-                .andExpect(jsonPath("$[1].id").value(2))
+                .andExpect(jsonPath("$[1].id").value(id2))
                 .andExpect(jsonPath("$[1].name").value("Google"));
     }
 
@@ -114,17 +157,18 @@ public class CompanyControllerTest {
                         "name": "Google"
                     }
                 """;
-        addData(requestBody);
+        long id = addData(requestBody);
         requestBody = """
                     {
+                        "id" : %d,
                         "name": "Meta"
                     }
-                """;
-        mockMvc.perform(put("/companies/{id}",2)
+                """.formatted(id);
+        mockMvc.perform(put("/companies/{id}",id)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(requestBody))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(2))
+                .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.name").value("Meta"));
     }
 
@@ -136,7 +180,7 @@ public class CompanyControllerTest {
                         "name": "Meta"
                     }
                 """;
-        mockMvc.perform(put("/companies/{id}",3)
+        mockMvc.perform(put("/companies/{id}",-1)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(requestBody))
                 .andExpect(status().isNotFound());
@@ -150,11 +194,11 @@ public class CompanyControllerTest {
                         "name": "Apple"
                     }
                 """;
-        addData(requestBody);
-        mockMvc.perform(delete(("/companies/{id}"), 1)
+        long id = addData(requestBody);
+        mockMvc.perform(delete(("/companies/{id}"), id)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.name").value("Apple"));
     }
 
@@ -174,31 +218,31 @@ public class CompanyControllerTest {
                         "name": "Apple"
                     }
                 """;
-        addData(requestBody);
+        long id1 = addData(requestBody);
         requestBody = """
                     {
                         "name": "Amazon"
                     }
                 """;
-        addData(requestBody);
+        long id2 = addData(requestBody);
         requestBody = """
                     {
                         "name": "Netflix"
                     }
                 """;
-        addData(requestBody);
+        long id3 = addData(requestBody);
         requestBody = """
                     {
                         "name": "X"
                     }
                 """;
-        addData(requestBody);
+        long id4 = addData(requestBody);
         requestBody = """
                     {
                         "name": "Nvidia"
                     }
                 """;
-        addData(requestBody);
+        long id5 = addData(requestBody);
         requestBody = """
                     {
                         "name": "AMD"
@@ -210,15 +254,15 @@ public class CompanyControllerTest {
 
         mockMvc.perform(get("/companies?page=1&size=5")
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].id").value(id1))
                 .andExpect(jsonPath("$[0].name").value("Apple"))
-                .andExpect(jsonPath("$[1].id").value(2))
+                .andExpect(jsonPath("$[1].id").value(id2))
                 .andExpect(jsonPath("$[1].name").value("Amazon"))
-                .andExpect(jsonPath("$[2].id").value(3))
+                .andExpect(jsonPath("$[2].id").value(id3))
                 .andExpect(jsonPath("$[2].name").value("Netflix"))
-                .andExpect(jsonPath("$[3].id").value(4))
+                .andExpect(jsonPath("$[3].id").value(id4))
                 .andExpect(jsonPath("$[3].name").value("X"))
-                .andExpect(jsonPath("$[4].id").value(5))
+                .andExpect(jsonPath("$[4].id").value(id5))
                 .andExpect(jsonPath("$[4].name").value("Nvidia"));
     }
 }

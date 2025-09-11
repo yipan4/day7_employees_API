@@ -39,11 +39,10 @@ public class CompanyService {
     }
 
     public Company updateCompanyInfo(long id, Company updateCompany) {
-        Company updatedCompany = companyRepository.updateCompany(id, updateCompany);
-        if (updatedCompany == null) {
+        if (companyRepository.findCompanyById(id) == null) {
             throw new CompanyNotFoundException("Company with ID %s not found".formatted(id));
         }
-        return updatedCompany;
+        return companyRepository.updateCompany(id, updateCompany);
     }
 
     public Company deleteCompany(long id) {

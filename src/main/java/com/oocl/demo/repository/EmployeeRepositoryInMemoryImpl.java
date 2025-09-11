@@ -1,7 +1,8 @@
 package com.oocl.demo.repository;
 
+import com.oocl.demo.model.DeleteEmployeeReq;
 import com.oocl.demo.model.Employee;
-import org.springframework.stereotype.Repository;
+import com.oocl.demo.model.UpdateEmployeeReq;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,8 +29,9 @@ public class EmployeeRepositoryInMemoryImpl implements EmployeeRepository {
                                 employee.getGender().equalsIgnoreCase(newEmployee.getGender()));
     }
 
-    public void createEmployee(Employee employee) {
+    public Employee createEmployee(Employee employee) {
         employees.add(employee);
+        return employee;
     }
 
     public Employee findEmployeeById(long id) {
@@ -41,11 +43,28 @@ public class EmployeeRepositoryInMemoryImpl implements EmployeeRepository {
         return employees;
     }
 
-    public Employee updateEmployee(long id, Employee employeeToBeUpdated) {
+    public Employee updateEmployee(long id, UpdateEmployeeReq employeeToBeUpdated) {
         for (int i = 0; i < employees.size(); i++) {
-            if (employees.get(i).getId() == employeeToBeUpdated.getId()) {
-                employees.set(i, employeeToBeUpdated);
-                return employees.get(i);
+            Employee employee = employees.get(i);
+            if (employee.getId() == id) {
+                employee.setSalary(employeeToBeUpdated.getSalary());
+                employee.setName(employeeToBeUpdated.getName());
+                employee.setAge(employeeToBeUpdated.getAge());
+                employees.set(i, employee);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Employee deleteEmployee(long id, DeleteEmployeeReq deleteEmployeeReq) {
+        Iterator<Employee> iter = employees.iterator();
+        while (iter.hasNext()) {
+            Employee deletedEmployee = iter.next();
+            if (deletedEmployee.getId() == (id)) {
+//                iter.remove();
+                deletedEmployee.setStatus(false);
+                return deletedEmployee;
             }
         }
         return null;
@@ -75,4 +94,11 @@ public class EmployeeRepositoryInMemoryImpl implements EmployeeRepository {
         }
         return paginationResult;
     }
+
+    @Override
+    public List<Employee> findByGender(String gender) {
+        return employees.stream().filter(employee -> employee.getGender().equalsIgnoreCase(gender))
+                .toList();
+    }
+
 }

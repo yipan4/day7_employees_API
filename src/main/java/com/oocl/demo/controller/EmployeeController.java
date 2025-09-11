@@ -1,5 +1,6 @@
 package com.oocl.demo.controller;
 
+import com.oocl.demo.model.UpdateEmployeeReq;
 import com.oocl.demo.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/employees/{id}")
-    public ResponseEntity<Employee> updateEmployeeInfo(@PathVariable long id, @RequestBody Employee employeeToBeUpdated) {
+    public ResponseEntity<Employee> updateEmployeeInfo(@PathVariable long id, @RequestBody UpdateEmployeeReq employeeToBeUpdated) {
         return ResponseEntity.status(HttpStatus.OK).body(employeeService.updateEmployeeInfo(id, employeeToBeUpdated));
     }
 

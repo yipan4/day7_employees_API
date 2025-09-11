@@ -1,7 +1,9 @@
 package com.oocl.demo.service;
 
 import com.oocl.demo.exception.*;
+import com.oocl.demo.model.DeleteEmployeeReq;
 import com.oocl.demo.model.Employee;
+import com.oocl.demo.model.UpdateEmployeeReq;
 import com.oocl.demo.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,8 +38,8 @@ public class EmployeeService {
         }
         employee.setId(employeeRepository.getNextUniqueId());
         employee.setStatus(true);
-        employeeRepository.createEmployee(employee);
-        return Map.of("id", employee.getId());
+        Employee createdEmployee = employeeRepository.createEmployee(employee);
+        return Map.of("id", createdEmployee.getId());
     }
 
     public Employee getEmployeeById(long id) {
@@ -52,7 +54,7 @@ public class EmployeeService {
         return employeeRepository.getAllEmployees();
     }
 
-    public Employee updateEmployeeInfo(long id, Employee employeeToBeUpdated) {
+    public Employee updateEmployeeInfo(long id, UpdateEmployeeReq employeeToBeUpdated) {
         Employee foundEmployee = employeeRepository.findEmployeeById(id);
         if (!foundEmployee.getStatus()) {
             return null;
@@ -69,13 +71,14 @@ public class EmployeeService {
             throw new EmployeeInactiveException("Employee status is false. Cannot delete.");
         }
         employee.setStatus(false);
-        return employeeRepository.updateEmployee(id, employee);
+        DeleteEmployeeReq deleteEmployee = new DeleteEmployeeReq();
+        deleteEmployee.setStatus(false);
+        return employeeRepository.deleteEmployee(id, deleteEmployee);
 //        return employeeRepository.deleteEmployee(id);
     }
 
     public List<Employee> getEmployeesByGender(String gender) {
-            return employeeRepository.getAllEmployees().stream().filter(employee -> employee.getGender().
-                    equalsIgnoreCase(gender)).toList();
+            return employeeRepository.findByGender(gender);
     }
 
     public List<Employee> getEmployeesWithPagination(int page, int size) {
