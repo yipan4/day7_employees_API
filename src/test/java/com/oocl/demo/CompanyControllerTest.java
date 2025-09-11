@@ -2,7 +2,6 @@ package com.oocl.demo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oocl.demo.controller.CompanyController;
-import com.oocl.demo.model.Company;
 import com.oocl.demo.model.Employee;
 import com.oocl.demo.repository.CompanyRepository;
 import com.oocl.demo.repository.EmployeeRepository;
