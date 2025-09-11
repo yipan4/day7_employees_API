@@ -1,4 +1,4 @@
-package com.oocl.demo.service;
+package com.oocl.demo.exception;
 
 public class EmployeeDuplicateCreationException extends RuntimeException {
     public EmployeeDuplicateCreationException(String message) {

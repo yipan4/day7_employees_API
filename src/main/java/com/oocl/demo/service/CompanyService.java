@@ -1,5 +1,8 @@
 package com.oocl.demo.service;
 
+import com.oocl.demo.exception.CompanyNotExistWhenDeleteException;
+import com.oocl.demo.exception.CompanyNotFoundException;
+import com.oocl.demo.exception.CompanyPaginationQueryRangeExceedException;
 import com.oocl.demo.model.Company;
 import com.oocl.demo.repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +49,7 @@ public class CompanyService {
     public Company deleteCompany(long id) {
         Company deletedCompany = companyRepository.deleteCompany(id);
         if (deletedCompany == null) {
-            throw new CompanyNotExistWhenDelete("Company with ID %s not found".formatted(id));
+            throw new CompanyNotExistWhenDeleteException("Company with ID %s not found".formatted(id));
         }
         return deletedCompany;
     }

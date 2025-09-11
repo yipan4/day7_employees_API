@@ -1,6 +1,12 @@
 package com.oocl.demo.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "t_employee")
 public class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
     private int age;

@@ -1,6 +1,6 @@
 package com.oocl.demo.controller;
 
-import com.oocl.demo.service.*;
+import com.oocl.demo.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    // Extract base exception class
     @ExceptionHandler(EmployeeDuplicateCreationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleEmployeeDuplicateCreationException(Exception e) {
@@ -49,7 +51,7 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
-    @ExceptionHandler(CompanyNotExistWhenDelete.class)
+    @ExceptionHandler(CompanyNotExistWhenDeleteException.class)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public String handleCompanyNotExistWhenDelete(Exception e) {
         return e.getMessage();

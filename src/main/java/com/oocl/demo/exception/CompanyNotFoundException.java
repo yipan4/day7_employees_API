@@ -1,4 +1,4 @@
-package com.oocl.demo.service;
+package com.oocl.demo.exception;
 
 public class CompanyNotFoundException extends RuntimeException {
     public CompanyNotFoundException(String message) {
